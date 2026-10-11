@@ -2,6 +2,10 @@
 
 All notable changes to Neon Arena are documented here.
 
+## [1.0.1] - 2026-10-11
+
+- **Marketplace name:** the action is listed as **Neon Arena 3D Contributions** in `action.yml`, because GitHub Marketplace names must be unique and "Neon Arena" was already taken. Workflows refer to the action by repository, so nothing changes for existing users. The project is still called Neon Arena.
+
 ## [1.0.0] - 2026-10-09
 
 First release. Neon Arena turns a GitHub contribution calendar into a neon 3D stadium, drawn as a single self-contained SVG.

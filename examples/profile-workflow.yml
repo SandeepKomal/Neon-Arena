@@ -82,7 +82,7 @@ jobs:
           echo "local_time=${LOCAL_DATE}" >> "$GITHUB_OUTPUT"
 
       - name: Generate Neon Arena
-        uses: SandeepKomal/neon-arena@v1.0.0
+        uses: SandeepKomal/neon-arena@v1.0.1
         with:
           username: ${{ github.repository_owner }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
