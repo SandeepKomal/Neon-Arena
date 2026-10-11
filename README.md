@@ -109,7 +109,7 @@ jobs:
           echo "local_time=${LOCAL_DATE}" >> "$GITHUB_OUTPUT"
 
       - name: Generate Neon Arena
-        uses: SandeepKomal/neon-arena@v1.0.0
+        uses: SandeepKomal/neon-arena@v1.0.1
         with:
           username: ${{ github.repository_owner }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -170,7 +170,7 @@ jobs:
 
 The workflow refreshes the SVG once an hour, picks the day or night theme from your local time, checks the result and commits it. Change `NEON_TIMEZONE` to your own [IANA time zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
-For production, pin the release tag `v1.0.0` or an immutable commit SHA rather than `main`.
+For production, pin the release tag `v1.0.1` or an immutable commit SHA rather than `main`.
 
 ### Step 2: show it in your README
 

@@ -1,6 +1,6 @@
 {
   "name": "neon-arena",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generate a 3D neon stadium of your GitHub contributions as an animated SVG for profile READMEs.",
   "type": "module",
   "bin": {
