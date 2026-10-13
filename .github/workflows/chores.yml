@@ -1,0 +1,102 @@
+name: Chores
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly maintenance on Monday at 04:37 UTC.
+    - cron: "37 4 * * 1"
+  pull_request:
+    paths:
+      - "package.json"
+      - "src/**"
+      - "test/**"
+      - ".github/workflows/chores.yml"
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "src/**"
+      - "test/**"
+      - ".github/workflows/chores.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chores-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  maintenance:
+    name: Maintenance checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Validate package metadata
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+
+          const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+          const required = ["name", "version", "description", "type", "scripts", "engines", "license"];
+          const missing = required.filter((key) => pkg[key] === undefined || pkg[key] === "");
+
+          if (missing.length) {
+            throw new Error(`package.json is missing required fields: ${missing.join(", ")}`);
+          }
+
+          if (pkg.type !== "module") {
+            throw new Error('Expected package.json "type" to remain "module".');
+          }
+
+          if (!pkg.scripts?.test || !pkg.scripts?.sample) {
+            throw new Error("Expected test and sample scripts to be defined.");
+          }
+
+          console.log(`Package metadata valid: ${pkg.name}@${pkg.version}`);
+          NODE
+
+      - name: Check source and test syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(src/*.mjs test/*.test.mjs)
+          if (( ${#files[@]} == 0 )); then
+            echo "ERROR: No source or test modules found."
+            exit 1
+          fi
+          for file in "${files[@]}"; do
+            node --check "$file"
+          done
+
+      - name: Run tests
+        run: npm test
+
+      - name: Regenerate sample previews
+        run: npm run sample
+
+      - name: Validate generated SVG previews
+        shell: bash
+        run: |
+          set -euo pipefail
+          for svg in out/preview-dark.svg out/preview-light.svg; do
+            test -s "$svg"
+            grep -q '<svg' "$svg"
+            grep -q '</svg>' "$svg"
+            size=$(wc -c < "$svg")
+            if (( size < 1000 )); then
+              echo "ERROR: $svg is unexpectedly small ($size bytes)."
+              exit 1
+            fi
+            echo "Validated $svg ($size bytes)"
+          done
