@@ -5,6 +5,12 @@ on:
   schedule:
     # Weekly maintenance on Monday at 04:37 UTC.
     - cron: "37 4 * * 1"
+  pull_request:
+    paths:
+      - "package.json"
+      - "src/**"
+      - "test/**"
+      - ".github/workflows/chores.yml"
   push:
     branches: [main]
     paths:
